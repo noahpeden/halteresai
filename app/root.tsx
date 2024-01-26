@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // root.tsx
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { withEmotionCache } from "@emotion/react";
-import { ChakraProvider } from "@chakra-ui/react";
 import {
 	Links,
 	LiveReload,
@@ -10,21 +8,24 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
-	useLoaderData,
-	json,
 } from "@remix-run/react";
-import { createClient } from "@supabase/supabase-js";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { AppProvider } from "./contexts/AppContext";
-import { MetaFunction, LinksFunction } from "@remix-run/node"; // Depends on the runtime you choose
-
+import { MetaFunction, LinksFunction, json } from "@remix-run/node"; // Depends on the runtime you choose
+import App from "./App";
 import { ServerStyleContext, ClientStyleContext } from "./context";
+
+export const loader = async () => {
+	return json({
+		ENV: {
+			PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+			PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+		},
+	});
+};
 
 export const meta: MetaFunction = () => [
 	{
 		charset: "utf-8",
-		title: "HalteresAI",
+		title: "New Remix App",
 		viewport: "width=device-width,initial-scale=1",
 	},
 ];
@@ -87,77 +88,10 @@ const Document = withEmotionCache(
 	}
 );
 
-export const loader = async () => {
-	return json({
-		ENV: {
-			PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-			PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-		},
-	});
-};
-
-interface Session {
-	provider_token?: string | null;
-	access_token: string;
-	expires_in: string;
-	expires_at: string;
-	refresh_token: string;
-	token_type: string;
-	user: User | null;
-}
-
-interface User {
-	id: string;
-	aud: string;
-	role: string;
-	email: string;
-	confirmed_at: string;
-	confirmation_sent_at: string;
-	last_sign_in_at: string;
-	created_at: string;
-	updated_at: string;
-}
-
-export default function App() {
-	const data = useLoaderData();
-	const supabase = createClient(
-		(data as any).ENV.PUBLIC_SUPABASE_URL,
-		(data as any).ENV.PUBLIC_SUPABASE_ANON_KEY
-	);
-
-	const [session, setSession] = useState<Session | null>(null);
-
-	useEffect(() => {
-		supabase.auth.getSession().then(({ data: { session } }) => {
-			setSession(session);
-		});
-
-		const {
-			data: { subscription },
-		} = supabase.auth.onAuthStateChange((_event, session) => {
-			setSession(session);
-		});
-
-		return () => subscription.unsubscribe();
-	}, []);
-
+export default function AppRoot() {
 	return (
-		<div>
-			{!session ? (
-				<Auth
-					supabaseClient={supabase}
-					appearance={{ theme: ThemeSupa }}
-					providers={["google"]}
-				/>
-			) : (
-				<Document>
-					<ChakraProvider>
-						<AppProvider>
-							<Outlet />
-						</AppProvider>
-					</ChakraProvider>
-				</Document>
-			)}
-		</div>
+		<Document>
+			<App />
+		</Document>
 	);
 }
