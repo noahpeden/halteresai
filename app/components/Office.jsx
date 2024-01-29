@@ -10,9 +10,10 @@ import {
 	HStack,
 	Heading,
 } from "@chakra-ui/react";
+import theme from "../theme";
 
 export default function Office() {
-	// const { addOfficeInfo } = useAppContext();
+	const { addOfficeInfo } = useAppContext();
 	const [equipmentList, setEquipmentList] = useState([]);
 	const [newEquipmentName, setNewEquipmentName] = useState("");
 	const [newEquipmentQuantity, setNewEquipmentQuantity] = useState("");
@@ -57,8 +58,10 @@ export default function Office() {
 	};
 
 	return (
-		<Box className="container mx-auto">
-			<Heading as="h1">Office</Heading>
+		<Box className="container mx-auto" p={5}>
+			<Heading as="h1" colorScheme="blue">
+				Office
+			</Heading>
 			<VStack spacing={4}>
 				<Box>
 					<Heading as="h2" size="md">
@@ -152,8 +155,9 @@ export default function Office() {
 					/>
 				</Box>
 			</VStack>
-
-			<Button onClick={handleSubmit}>Next</Button>
+			<Button colorScheme="blue" mt={4} onClick={handleSubmit}>
+				Save
+			</Button>
 		</Box>
 	);
 }
