@@ -5,10 +5,11 @@ import {
 	Links,
 	LiveReload,
 	Meta,
-	Outlet,
 	Scripts,
 	ScrollRestoration,
 } from "@remix-run/react";
+import { AppProvider } from "./contexts/AppContext";
+import { ChakraProvider } from "@chakra-ui/react";
 import { MetaFunction, LinksFunction, json } from "@remix-run/node"; // Depends on the runtime you choose
 import App from "./App";
 import { ServerStyleContext, ClientStyleContext } from "./context";
@@ -91,7 +92,11 @@ const Document = withEmotionCache(
 export default function AppRoot() {
 	return (
 		<Document>
-			<App />
+			<ChakraProvider>
+				<AppProvider>
+					<App />
+				</AppProvider>
+			</ChakraProvider>
 		</Document>
 	);
 }

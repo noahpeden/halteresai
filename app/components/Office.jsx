@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 
 export default function Office() {
-	const { addOfficeInfo } = useAppContext();
+	// const { addOfficeInfo } = useAppContext();
 	const [equipmentList, setEquipmentList] = useState([]);
 	const [newEquipmentName, setNewEquipmentName] = useState("");
 	const [newEquipmentQuantity, setNewEquipmentQuantity] = useState("");

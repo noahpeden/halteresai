@@ -1,12 +1,5 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
-import {
-	Links,
-	LiveReload,
-	Meta,
-	Outlet,
-	Scripts,
-	ScrollRestoration,
-} from "@remix-run/react";
+import { Outlet, ScrollRestoration } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { Auth } from "@supabase/auth-ui-react";
@@ -48,26 +41,24 @@ export default function App() {
 
 		return () => subscription.unsubscribe();
 	}, [supabase.auth]);
-	console.log(supabase);
+
 	return (
-		<html lang="en">
-			<body>
-				{!session ? (
-					<Auth
-						supabaseClient={supabase}
-						appearance={{ theme: ThemeSupa }}
-						providers={["google"]}
-					/>
-				) : (
-					<Outlet />
-				)}
-				<ScrollRestoration />
-				<script
-					dangerouslySetInnerHTML={{
-						__html: `window.ENV = ${JSON.stringify(data.ENV)}`,
-					}}
+		<div>
+			{!session ? (
+				<Auth
+					supabaseClient={supabase}
+					appearance={{ theme: ThemeSupa }}
+					providers={["google"]}
 				/>
-			</body>
-		</html>
+			) : (
+				<Outlet />
+			)}
+			<ScrollRestoration />
+			<script
+				dangerouslySetInnerHTML={{
+					__html: `window.ENV = ${JSON.stringify(data.ENV)}`,
+				}}
+			/>
+		</div>
 	);
 }
