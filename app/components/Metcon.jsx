@@ -20,6 +20,10 @@ import {
 	AlertIcon,
 	AlertTitle,
 	AlertDescription,
+	Textarea,
+	FormControl,
+	FormLabel,
+	FormHelperText,
 } from "@chakra-ui/react";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 
@@ -38,6 +42,7 @@ export default function Metcon() {
 	const [loading, setLoading] = useState(false);
 	const [phase, setPhase] = useState(PHASE.INITIAL);
 	const [skeletonContent, setSkeletonContent] = useState("");
+	const [userFeedback, setUserFeedback] = useState("");
 
 	// Phase 1: Skeleton prompt - just high-level structure, no details
 	const skeletonPrompt = `
@@ -72,7 +77,12 @@ Based on the approved workout skeleton below, now generate the COMPLETE detailed
 
 APPROVED SKELETON:
 ${skeletonContent}
+${userFeedback ? `
+ADDITIONAL USER REQUESTS:
+${userFeedback}
 
+IMPORTANT: Incorporate the user's additional requests above when generating the full workouts. These requests take priority and should be reflected in the final program.
+` : ""}
 For each day in the skeleton, now provide the full workout including:
 - Detailed warm-up (10-15 minutes)
 - Specific exercises with exact rep schemes
@@ -146,6 +156,7 @@ Generate complete, detailed workouts following the structure from the skeleton.
 	const handleReset = () => {
 		setPhase(PHASE.INITIAL);
 		setSkeletonContent("");
+		setUserFeedback("");
 		resetMessages();
 		setLoading(false);
 	};
@@ -222,14 +233,15 @@ Generate complete, detailed workouts following the structure from the skeleton.
 				)}
 
 				{phase === PHASE.SKELETON && !loading && messages.length > 0 && (
-					<>
-						<Button colorScheme="green" onClick={handleApproveSkeleton}>
-							Approve & Generate Full Workouts
-						</Button>
-						<Button colorScheme="gray" variant="outline" onClick={handleReset}>
-							Start Over
-						</Button>
-					</>
+					<Button colorScheme="green" onClick={handleApproveSkeleton}>
+						Approve & Generate Full Workouts
+					</Button>
+				)}
+
+				{phase === PHASE.SKELETON && !loading && messages.length > 0 && (
+					<Button colorScheme="gray" variant="outline" onClick={handleReset}>
+						Start Over
+					</Button>
 				)}
 
 				{phase === PHASE.FULL && !loading && (
@@ -267,7 +279,7 @@ Generate complete, detailed workouts following the structure from the skeleton.
 						<AlertDescription>
 							{phase === PHASE.SKELETON &&
 								!loading &&
-								"Review the workout skeleton below. If it looks good, approve it to generate full workout details."}
+								"Review the workout skeleton below. Add any specific requests, then approve to generate full workout details."}
 							{phase === PHASE.SKELETON &&
 								loading &&
 								"Generating a quick outline of your program..."}
@@ -280,6 +292,32 @@ Generate complete, detailed workouts following the structure from the skeleton.
 						</AlertDescription>
 					</Box>
 				</Alert>
+			)}
+
+			{/* Feedback textarea for skeleton phase */}
+			{phase === PHASE.SKELETON && !loading && messages.length > 0 && (
+				<Box my={4} p={4} borderWidth="1px" borderRadius="md" bg="gray.50">
+					<FormControl>
+						<FormLabel fontWeight="semibold">
+							Additional Requests (Optional)
+						</FormLabel>
+						<Textarea
+							placeholder="Add any specific requests for the full workouts, e.g.:
+- Include Fran on Day 3
+- Make Wednesday a lighter recovery day
+- Add more Olympic lifting on Friday
+- Include a hero WOD on Saturday"
+							value={userFeedback}
+							onChange={(e) => setUserFeedback(e.target.value)}
+							size="md"
+							rows={4}
+							bg="white"
+						/>
+						<FormHelperText>
+							These requests will be incorporated when generating the full workout details.
+						</FormHelperText>
+					</FormControl>
+				</Box>
 			)}
 
 			<Box>
